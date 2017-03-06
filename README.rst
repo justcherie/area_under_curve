@@ -12,13 +12,15 @@ area\_under\_curve
 
 example:
 
-``python area_under_curve\__init__.py --cubic 1 --quadratic 0 --linear 0 --constant -0 --lower 0 --upper 10 --step .1 --algorithm trapezoid``
+``python area_under_curve\__init__.py --cubic 1 --lower 0 --upper 10 --step .1 --algorithm simpson``
 
 or:
 
 ``import area_under_curve as auc``
 
-``algorithm = auc.get_algorithm("trapezoid")``
+``algorithm = auc.get_algorithm("simpson")``
+
+``auc.LOGGING = False``
 
 ``bounds = auc.get_bounds(0, 10, .1)``
 
