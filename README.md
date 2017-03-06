@@ -1,5 +1,5 @@
 # area_under_curve
-* Version 0.2
+* Version 0.3
 * Python 3 module to calculate area under a curve
 * Copyright 2017 Steven Mycynek
 * Supports midpoint, trapezoid, and simpson approximations

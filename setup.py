@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='area_under_curve',
-      version='0.2',
+      version='0.3',
       description='Calculate area under curve',
       url='https://github.com/smycynek/area_under_curve',
       author='Steven Mycynek',
