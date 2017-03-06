@@ -12,7 +12,7 @@ example:
 `python area_under_curve.py --cubic 1 --quadratic 0 --linear 0 --constant -0 --lower 0 --upper 10 --step .1 --algorithm trapezoid`
 
 
-or 
+or:
 
 `import area_under_curve as auc`
 
@@ -25,3 +25,5 @@ or
 `params = auc.Parameters._make([polynomial, bounds, algorithm])`
 
 `AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)`
+
+`print(str(AREA))`
