@@ -7,7 +7,7 @@ import sys
 import math
 import numpy
 
-USAGE = " -c|--cubic <cubic_coeff> -q|--quadratic <quadratic_coeff> -i|--linear <linear_coeff> -n|--constant <constant> " + " -l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> -a|--algorithm <simpson | trapezoid | midpoint> \n" + "e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the trapezoid algorithm:\n\n'python area-under-curve.py --cubic 0 --quadratic 1 --linear 2 --constant -2 --lower 1 --upper 50 --step .1 --algorithm trapezoid'"
+USAGE = " -c|--cubic <cubic_coeff> -q|--quadratic <quadratic_coeff> -i|--linear <linear_coeff> -n|--constant <constant> " + " -l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> -a|--algorithm <simpson | trapezoid | midpoint> \n" + "e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the trapezoid algorithm:\n\n'python area_under_curve.py --cubic 0 --quadratic 1 --linear 2 --constant -2 --lower 1 --upper 50 --step .1 --algorithm trapezoid'"
 Bounds = collections.namedtuple("Bounds", ['lower', 'upper', 'step_size', 'range'])
 Polynomial = collections.namedtuple("Polynomial", ['cubic', 'quadratic', 'linear', 'constant'])
 Parameters = collections.namedtuple("Parameters", ["polynomial", "bounds", "algorithm"])
