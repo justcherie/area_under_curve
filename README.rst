@@ -1,6 +1,7 @@
 area\_under\_curve
 ==================
 
+
 -  Supports midpoint, trapezoid, and simpson approximations
 -  https://pypi.python.org/pypi/area-under-curve
 
