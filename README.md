@@ -17,8 +17,11 @@ or
 `import area_under_curve as auc`
 
 `algorithm = auc.get_algorithm("trapezoid")`
+
 `bounds = auc.get_bounds(0, 10, .1)`
+
 `polynomial = auc.get_polynomial(1, 0, 0, 0)`
+
 `params = auc.Parameters._make([polynomial, bounds, algorithm])`
 
 `AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)`
