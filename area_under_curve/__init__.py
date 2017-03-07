@@ -37,6 +37,7 @@ def is_number(string):
         float(string)
         return True
     except ValueError:
+        log("Error: " + string)
         return False
 
 def has_property(name):
@@ -63,10 +64,10 @@ def parse_arguments(argv):
         opts, args = getopt.getopt(argv, "hc:q:l:i:n:l:u:s:a:",
                                    ["cubic=", "quadratic=", "linear=", "constant=",
                                     "lower=", "upper=", "step=", "algorithm="])
-        for opt in opts[:-1]:
-            if not is_number(opt[1]):
-                log("Error: " + opt[1])
-                return
+        numerical_params = list(filter(lambda t: t[0] != '-a' and t[0] != '--algorithm', opts))
+        if any(map(lambda n: not is_number(n[1]), numerical_params)):
+            log("Error in numerical arguments.")
+            return
     except getopt.GetoptError:
         log("Error...")
         return
@@ -172,14 +173,12 @@ def area_under_curve(poly, bounds, algorithm):
     log("Algorithm: " + algorithm.__name__)
     range_upper_index = len(bounds.range) - 1
     total_area = 0
-    range_index = 0
-    for val in bounds.range:
+    for range_index, val in enumerate(bounds.range):
         # Can't calculate trapezoid with only lower bound value, so we're done summing.
         if range_index == range_upper_index:
             return total_area
         else:
             total_area += algorithm(poly, val, bounds.range[range_index + 1])
-            range_index += 1
 
 
 if __name__ == '__main__':
