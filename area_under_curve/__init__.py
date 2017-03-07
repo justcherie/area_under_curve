@@ -1,5 +1,7 @@
 #!python3
-"""Find approximate sum area under curve"""
+"""Find approximate sum area under curve
+Supports simpson, trapezoid, and midpoint algorithms and variable step size
+"""
 
 import collections
 import getopt
@@ -9,7 +11,15 @@ import numpy
 
 LOGGING = True # Typically set to false when not using interactively
 
-USAGE = " -c|--cubic <cubic_coeff> -q|--quadratic <quadratic_coeff> -i|--linear <linear_coeff> -n|--constant <constant> " + " -l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> -a|--algorithm <simpson | trapezoid | midpoint> \n" + "e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the midpoint algorithm:\n\n'python __init__.py --quadratic 1 --linear 2 --constant -2 --lower 1 --upper 50 --step .1 --algorithm midpoint'"
+USAGE = """ -c|--cubic <cubic_coeff> -q|--quadratic <quadratic_coeff>
+-i|--linear <linear_coeff> -n|--constant <constant> 
+-l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> 
+-a|--algorithm <simpson | trapezoid | midpoint>
+
+e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the midpoint algorithm:
+
+python __init__.py --quadratic 1 --linear 2 --constant -2 --lower 1 --upper 50 --step .1 --algorithm midpoint'"""
+
 FULL_USAGE = USAGE
 
 Bounds = collections.namedtuple("Bounds", ['lower', 'upper', 'step_size', 'range'])
@@ -17,7 +27,9 @@ Polynomial = collections.namedtuple("Polynomial", ['cubic', 'quadratic', 'linear
 Parameters = collections.namedtuple("Parameters", ["polynomial", "bounds", "algorithm"])
 
 def parse_arguments(argv):
-    """Parse command line arguments and return a parameters object with Bounds, Polynomial, and Algorithm"""
+    """Parse command line arguments and return a parameters
+    object with Bounds, Polynomial, and Algorithm
+    """
     cubic = 0
     quadratic = 0
     linear = 0
@@ -27,7 +39,9 @@ def parse_arguments(argv):
     step_size = 1
     algorithm = "trapezoid"
     try:
-        opts, args = getopt.getopt(argv, "hc:q:l:i:n:l:u:s:a:", ["cubic=", "quadratic=", "linear=", "constant=", "lower=", "upper=", "step=", "algorithm="])
+        opts, args = getopt.getopt(argv, "hc:q:l:i:n:l:u:s:a:",
+                                   ["cubic=", "quadratic=", "linear=", "constant=",
+                                    "lower=", "upper=", "step=", "algorithm="])
         for opt in opts[:-1]:
             if not is_number(opt[1]):
                 if LOGGING:
@@ -68,7 +82,8 @@ def parse_arguments(argv):
         if LOGGING:
             print("Algorithm :" + algorithm + " not found!")
         return
-    return get_parameters(cubic, quadratic, linear, constant, lower, upper, step_size, algorithm_function)
+    return get_parameters(cubic, quadratic, linear, constant,
+                          lower, upper, step_size, algorithm_function)
 
 def get_parameters(cubic, quadratic, linear, constant, lower, upper, step, algorithm):
     """Create parameters tuple from polynomial, bounds, and algorithm parameters"""
@@ -133,7 +148,9 @@ def get_algorithm(algorithm_name):
             print("Algorithm " + algorithm_name + " not found or invalid!")
 
 def area_under_curve(poly, bounds, algorithm):
-    """Finds the area under a polynomial between the specified bounds using a rectangle-sum (of width 1) approximation."""
+    """Finds the area under a polynomial between the specified bounds
+    using a rectangle-sum (of width 1) approximation.
+    """
     if LOGGING:
         print(print_bounds(bounds))
         print(print_polynomial(poly))
@@ -142,7 +159,8 @@ def area_under_curve(poly, bounds, algorithm):
     total_area = 0
     range_index = 0
     for val in bounds.range:
-        if range_index == range_upper_index: # Can't calculate trapezoid with only lower bound value, so we're done summing.
+        # Can't calculate trapezoid with only lower bound value, so we're done summing.
+        if range_index == range_upper_index:
             return total_area
         else:
             total_area += algorithm(poly, val, bounds.range[range_index + 1])
@@ -162,5 +180,6 @@ if __name__ == '__main__':
     if not PARSED_PARAMETERS:
         print(FULL_USAGE)
         exit(2)
-    AREA = area_under_curve(PARSED_PARAMETERS.polynomial, PARSED_PARAMETERS.bounds, PARSED_PARAMETERS.algorithm)
+    AREA = area_under_curve(PARSED_PARAMETERS.polynomial, 
+                            PARSED_PARAMETERS.bounds, PARSED_PARAMETERS.algorithm)
     print("Total Area (" + PARSED_PARAMETERS.algorithm.__name__ + ")= " + str(AREA))
