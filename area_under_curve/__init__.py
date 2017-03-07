@@ -26,6 +26,27 @@ Bounds = collections.namedtuple("Bounds", ['lower', 'upper', 'step_size', 'range
 Polynomial = collections.namedtuple("Polynomial", ['cubic', 'quadratic', 'linear', 'constant'])
 Parameters = collections.namedtuple("Parameters", ["polynomial", "bounds", "algorithm"])
 
+def log(string):
+    """Simple logging"""
+    if LOGGING:
+        print(string)
+
+def is_number(string):
+    """Simple check to see if string is valid number"""
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+def has_property(name):
+    """Simple function property decorator"""
+    def wrap(func):
+        """Wrapper function"""
+        setattr(func, name, True)
+        return func
+    return wrap
+
 def parse_arguments(argv):
     """Parse command line arguments and return a parameters
     object with Bounds, Polynomial, and Algorithm
@@ -44,15 +65,14 @@ def parse_arguments(argv):
                                     "lower=", "upper=", "step=", "algorithm="])
         for opt in opts[:-1]:
             if not is_number(opt[1]):
-                if LOGGING:
-                    print("Error: " + opt[1])
+                log("Error: " + opt[1])
                 return
     except getopt.GetoptError:
-        print("Error...")
+        log("Error...")
         return
     for opt, arg in opts:
         if opt == "-h":
-            print(FULL_USAGE)
+            log(FULL_USAGE)
             return
         elif opt in ("-c", "--cubic"):
             cubic = float(arg)
@@ -71,16 +91,13 @@ def parse_arguments(argv):
         elif opt in ("-a", "--algorithm"):
             algorithm = arg
         else:
-            if LOGGING:
-                print("?")
+            log("?")
     if cubic == 0 and quadratic == 0 and linear == 0 and constant == 0:
-        if LOGGING:
-            print(FULL_USAGE)
-            print("")
+        log(FULL_USAGE)
+        log("")
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
-        if LOGGING:
-            print("Algorithm :" + algorithm + " not found!")
+        log("Algorithm :" + algorithm + " not found!")
         return
     return get_parameters(cubic, quadratic, linear, constant,
                           lower, upper, step_size, algorithm_function)
@@ -102,6 +119,15 @@ def get_bounds(lower, upper, step):
     new_bounds = Bounds._make([lower, upper, step, full_range])
     return new_bounds
 
+def get_algorithm(algorithm_name):
+    """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""
+    if algorithm_name in globals():
+        algorithm = globals()[algorithm_name]
+        if "algorithm" in dir(algorithm):
+            return globals()[algorithm_name]
+    else:
+        log("Algorithm " + algorithm_name + " not found or invalid!")
+
 def print_polynomial(poly):
     """Formats polynomial tuple coefficients as an algebraic function"""
     return "f(x) = " + str(poly.cubic) + " x^3 + " + str(poly.quadratic) + " x^2 + " + str(poly.linear) + "x + " +  str(poly.constant)
@@ -116,45 +142,34 @@ def evaluate_polynomial(x, poly):
     fx_value = (poly.cubic * math.pow(x, 3)) + (poly.quadratic * math.pow(x, 2)) + (poly.linear * x) + poly.constant
     return fx_value
 
+@has_property("algorithm")
 def midpoint(poly, lower, upper):
     """Calculate midpoint slice from two polynomial evaluations and step size"""
     value = evaluate_polynomial((upper+lower)/2, poly)
     return (upper - lower) * value
-midpoint.algorithm = True
 
+@has_property("algorithm")
 def trapezoid(poly, lower, upper):
     """Calculate trapezoid slice from two polynomial evaluations and step size"""
     lower_value = evaluate_polynomial(lower, poly)
     upper_value = evaluate_polynomial(upper, poly)
     return (upper - lower) * ((lower_value + upper_value)/2)
-trapezoid.algorithm = True
 
+@has_property("algorithm")
 def simpson(poly, lower, upper):
     """Calculate parabola (Simpson) slice from two polynomial evaluations and step size"""
     lower_value = evaluate_polynomial(lower, poly)
     upper_value = evaluate_polynomial(upper, poly)
     midpoint_value = evaluate_polynomial((lower+upper)/2, poly)
     return ((upper - lower) / 6) * (lower_value + 4 * midpoint_value + upper_value)
-simpson.algorithm = True
-
-def get_algorithm(algorithm_name):
-    """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""
-    if algorithm_name in globals():
-        algorithm = globals()[algorithm_name]
-        if "algorithm" in dir(algorithm):
-            return globals()[algorithm_name]
-    else:
-        if LOGGING:
-            print("Algorithm " + algorithm_name + " not found or invalid!")
 
 def area_under_curve(poly, bounds, algorithm):
     """Finds the area under a polynomial between the specified bounds
     using a rectangle-sum (of width 1) approximation.
     """
-    if LOGGING:
-        print(print_bounds(bounds))
-        print(print_polynomial(poly))
-        print("Algorithm: " + algorithm.__name__)
+    log(print_bounds(bounds))
+    log(print_polynomial(poly))
+    log("Algorithm: " + algorithm.__name__)
     range_upper_index = len(bounds.range) - 1
     total_area = 0
     range_index = 0
@@ -166,20 +181,13 @@ def area_under_curve(poly, bounds, algorithm):
             total_area += algorithm(poly, val, bounds.range[range_index + 1])
             range_index += 1
 
-def is_number(string):
-    """Simple check to see if string is valid number"""
-    try:
-        float(string)
-        return True
-    except ValueError:
-        return False
 
 if __name__ == '__main__':
     FULL_USAGE = __doc__ + "\n\nUsage : python " + sys.argv[0] + USAGE
     PARSED_PARAMETERS = parse_arguments(sys.argv[1:])
     if not PARSED_PARAMETERS:
-        print(FULL_USAGE)
+        log(FULL_USAGE)
         exit(2)
     AREA = area_under_curve(PARSED_PARAMETERS.polynomial, 
                             PARSED_PARAMETERS.bounds, PARSED_PARAMETERS.algorithm)
-    print("Total Area (" + PARSED_PARAMETERS.algorithm.__name__ + ")= " + str(AREA))
+    log("Total Area (" + PARSED_PARAMETERS.algorithm.__name__ + ")= " + str(AREA))
