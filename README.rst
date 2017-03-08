@@ -1,18 +1,28 @@
 area\_under\_curve
 ==================
 
+-  Version 0.94
+-  Python 3 module to calculate area under a curve
+-  Copyright 2017 Steven Mycynek
+-  Supports simpson, trapezoid, and midpoint algorithms, n-degree single variable polynomials, and
+   variable step size
 
--  Supports midpoint, trapezoid, and simpson approximations
--  https://github.com/smycynek/area_under_curve/
+-  https://pypi.python.org/pypi/area-under-curve
+-  https://github.com/smycynek/area\_under\_curve/
 
--  This was just a fun experiment I did on an airplane and probably isn't suitable for production
-   use. Try a simple function you can integrate by hand easily, like ``f(x) = x^3`` from ``[0-10]``,
-   and compare that to how accurate the midpoint, trapezoid, and simpson approximations are with
-   various steps sizes.
+``USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}...``
+``-l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step>``
+``-a|--algorithm <simpson | trapezoid | midpoint>``
+
+-  This was just a fun experiment I did on a couple airplane rides and might not be suitable for
+   production use.
+-  Try a simple function you can integrate by hand easily, like ``f(x) = x^3`` from ``[0-10]``, and
+   compare that to how accurate the midpoint, trapezoid, and simpson approximations are with various
+   steps sizes.
 
 example:
 
-``python area_under_curve\__init__.py --cubic 1 --lower 0 --upper 10 --step .1 --algorithm simpson``
+``python area_under_curve\__init__.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
 
 or:
 
@@ -20,11 +30,9 @@ or:
 
 ``algorithm = auc.get_algorithm("simpson")``
 
-``auc.LOGGING = False``
+``bounds = auc.Bounds(0, 10, .1)``
 
-``bounds = auc.get_bounds(0, 10, .1)``
-
-``polynomial = auc.get_polynomial(1, 0, 0, 0)``
+``polynomial = auc.Polynomial({3:1})``
 
 ``params = auc.Parameters._make([polynomial, bounds, algorithm])``
 
