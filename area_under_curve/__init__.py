@@ -1,25 +1,24 @@
 #!python3
-"""Find approximate sum area under curve
-Supports simpson, trapezoid, and midpoint algorithms,
-n-degree single variable polynomials,
-and variable step size
+"""Find approximate area under curve:  Supports simpson, trapezoid, and
+midpoint algorithms,  n-degree single variable polynomials, and variable step size
 """
 import ast
 import collections
 import getopt
-import sys
 import math
+import sys
 import numpy
 
 LOGGING = True # Typically set to false when not using interactively
 
-USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}...
+USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}
 -l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> 
 -a|--algorithm <simpson | trapezoid | midpoint>
+  defaults: step_size:1, lower_bound:0, upper_bound:10, algorithm:trapezoid
 
 e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the midpoint algorithm:
-
-python __init__.py --poly "{2:1, 1:2, 0:-2}" --lower 1 --upper 50 --step .1 --algorithm midpoint"""
+ python __init__.py --poly "{2:1, 1:2, 0:-2}" --lower 1 --upper 50 --step .1 --algorithm midpoint
+"""
 
 FULL_USAGE = USAGE
 
@@ -31,10 +30,13 @@ class Bounds:
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.step_size = step_size
+        if step_size <= 0:
+            raise ValueError("step size must be > 0")
         self.full_range = numpy.arange(lower_bound, upper_bound + step_size, step_size).tolist()
 
     def __str__(self):
-        return "Bounds: [" + str(self.lower_bound) + "-" + str(self.upper_bound) + "] step_size: " +  str(self.step_size)
+        return "Bounds: [{} - {}], step_size: {}".format(
+            self.lower_bound, self.upper_bound, self.step_size)
 
 
 class Polynomial:
@@ -46,22 +48,21 @@ class Polynomial:
             f(x) = 9x^5 + 3 would be {5:9, 0:3}
         """
         self.coefficient_dict = coefficient_dict
-    
+
     def format_term(self, degree, value):
         """string format a single term"""
         value_formatted = str(value)
         if value == 1:
             value_formatted = ""
-
-        if degree == 0:
-            return str(value)
         if value == 0:
             return
+        if degree == 0:
+            return str(value)
         else:
             if degree == 1:
-                return value_formatted + "x"
+                return "{}x".format(value_formatted)
             else:
-                return value_formatted + "x^" + str(degree)
+                return "{}x^{}".format(value_formatted, degree)
 
     def __str__(self):
         """string format the entire polynomial"""
@@ -73,24 +74,24 @@ class Polynomial:
             term_formatted = (self.format_term(degree, self.coefficient_dict[degree]))
             if term_formatted:
                 terms.append(term_formatted)
-        return "f(x)=" + " + ".join(terms)
+        if not terms:
+            return "f(x)=0"
+        return "f(x)={}".format(" + ".join(terms))
 
     def evaluate(self, value):
         """Evaluate the polynomial at a given value"""
         total = 0
         for degree in self.coefficient_dict:
             current_term = math.pow(value, degree)* self.coefficient_dict[degree]
-            # print("order: " + str(order) + " coeff " + str(self.coefficient_dict[order]) + " current  " + str(current_term))
             total += current_term
         return total
-    
-
 
 def parse_polynomial_coefficients(dict_literal):
+    """Try to parse string into dictionary, return None on failure"""
     try:
         return ast.literal_eval(dict_literal)
-    except:
-        log("Error parsing polynomial args: " + dict_literal)
+    except ValueError as err:
+        log("Error parsing polynomial args: {} {}".format(dict_literal, str(err)))
         return None
 
 
@@ -104,8 +105,8 @@ def is_number(string):
     try:
         float(string)
         return True
-    except ValueError:
-        log("Error: " + string)
+    except ValueError as err:
+        log("Error: {} {}".format(string, str(err)))
         return False
 
 def has_property(name):
@@ -125,20 +126,26 @@ def parse_arguments(argv):
     step_size = 1
     algorithm = "trapezoid"
     polynomial_coefficients = {}
-
     try:
-        opts, args = getopt.getopt(argv, "hl:u:s:a:p:", ["lower=", "upper=", "step=", "algorithm=", "polynomial="])
-        numerical_params = list(filter(lambda t: t[0] != '-a' and t[0] != '--algorithm' and t[0] != "-p" and t[0] !="--polynomial", opts))
+        opts, args = getopt.getopt(argv, "hl:u:s:a:p:",
+                                   ["lower=", "upper=", "step=",
+                                    "algorithm=", "polynomial=", "help"])
+        numerical_params = list(filter(lambda t: t[0] != '-a' and
+                                       t[0] != '-h' and
+                                       t[0] != '--help' and
+                                       t[0] != '--algorithm' and
+                                       t[0] != "-p" and
+                                       t[0] != "--polynomial", opts))
         if any(map(lambda n: not is_number(n[1]), numerical_params)):
             log("Error in numerical arguments.")
             return
-    except getopt.GetoptError:
-        log("Error...")
+    except getopt.GetoptError as err:
+        log("Option error: {}".format(str(err)))
         return
     for opt, arg in opts:
-        if opt == "-h":
+        if opt in ("-h", "--help"):
             log(FULL_USAGE)
-            return
+            exit(0)
         elif opt in ("-l", "--lower"):
             lower = float(arg)
         elif opt in ("-u", "--upper"):
@@ -151,10 +158,16 @@ def parse_arguments(argv):
             polynomial_coefficients = parse_polynomial_coefficients(arg)
         else:
             log("?")
+        if step_size <= 0:
+            log("step size must be > 0: {}".format(step_size))
+            return
+        if lower >= upper:
+            log("invalid bounds: {} {}".format(lower, upper))
+            return
 
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
-        log("Algorithm :" + algorithm + " not found!")
+        log("Algorithm : {} not found!".format(algorithm))
         return
     if not polynomial_coefficients:
         log("Polynomial not specified or invalid")
@@ -175,7 +188,7 @@ def get_algorithm(algorithm_name):
         if "algorithm" in dir(algorithm):
             return globals()[algorithm_name]
     else:
-        log("Algorithm " + algorithm_name + " not found or invalid!")
+        log("Algorithm {} not found or invalid!".format(algorithm_name))
 
 @has_property("algorithm")
 def midpoint(poly, lower, upper):
@@ -204,7 +217,7 @@ def area_under_curve(poly, bounds, algorithm):
     """
     log(bounds)
     log(poly)
-    log("Algorithm: " + algorithm.__name__)
+    log("Algorithm: {}".format(algorithm.__name__))
     range_upper_index = len(bounds.full_range) - 1
     total_area = 0
     for range_index, val in enumerate(bounds.full_range):
@@ -216,11 +229,11 @@ def area_under_curve(poly, bounds, algorithm):
 
 
 if __name__ == '__main__':
-    FULL_USAGE = __doc__ + "\n\nUsage : python " + sys.argv[0] + USAGE
+    FULL_USAGE = '{}\nUsage: python {} {}'.format(__doc__, sys.argv[0], USAGE)
     PARSED_PARAMETERS = parse_arguments(sys.argv[1:])
     if not PARSED_PARAMETERS:
         log(FULL_USAGE)
         exit(2)
     AREA = area_under_curve(PARSED_PARAMETERS.polynomial,
                             PARSED_PARAMETERS.bounds, PARSED_PARAMETERS.algorithm)
-    log("Total Area (" + PARSED_PARAMETERS.algorithm.__name__ + ")= " + str(AREA))
+    log("Total Area ({}) = {}".format(PARSED_PARAMETERS.algorithm.__name__, AREA))

@@ -1,13 +1,10 @@
 area\_under\_curve
 ==================
 
--  Version 0.94
 -  Python 3 module to calculate area under a curve
--  Copyright 2017 Steven Mycynek
 -  Supports simpson, trapezoid, and midpoint algorithms, n-degree single variable polynomials, and
    variable step size
 
--  https://pypi.python.org/pypi/area-under-curve
 -  https://github.com/smycynek/area\_under\_curve/
 
 ``USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}...``
