@@ -32,6 +32,8 @@ class Bounds:
         self.step_size = step_size
         if step_size <= 0:
             raise ValueError("step size must be > 0")
+        if upper_bound <= lower_bound:
+            raise ValueError("invalid bounds")
         self.full_range = numpy.arange(lower_bound, upper_bound + step_size, step_size).tolist()
 
     def __str__(self):
@@ -48,6 +50,8 @@ class Polynomial:
             f(x) = 9x^5 + 3 would be {5:9, 0:3}
         """
         self.coefficient_dict = coefficient_dict
+        if any(map(lambda n: n < 0, coefficient_dict.keys())):
+            raise ValueError("Only positive exponents supported")
 
     def format_term(self, degree, value):
         """string format a single term"""
@@ -168,6 +172,9 @@ def parse_arguments(argv):
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
         log("Algorithm : {} not found!".format(algorithm))
+        return
+    if any(map(lambda n: n < 0, polynomial_coefficients.keys())):
+        log("Only positive exponents supported")
         return
     if not polynomial_coefficients:
         log("Polynomial not specified or invalid")
