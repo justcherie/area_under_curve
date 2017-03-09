@@ -1,5 +1,5 @@
 # area_under_curve
-* Version 0.9.1
+* Version 0.9.2
 * Python 3 module to calculate area under a curve
 * Copyright 2017 Steven Mycynek
 * Supports simpson, trapezoid, and midpoint algorithms, n-degree single variable polynomials, and variable step size
@@ -33,3 +33,6 @@ or:
 `AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)`
 
 `print(str(AREA))`
+
+
+Also try out `unit_test.py`.

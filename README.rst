@@ -36,3 +36,5 @@ or:
 ``AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)``
 
 ``print(str(AREA))``
+
+Also try out ``unit_test.py``.

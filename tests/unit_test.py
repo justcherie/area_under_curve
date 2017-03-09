@@ -20,15 +20,15 @@ class BoundsTest(unittest.TestCase):
         assert len(bounds_ok.full_range) == 21
         #print(bounds_ok.full_range)
 
-    @unittest.expectedFailure
     def test_bad_step_size(self):
         """run test method"""
-        auc.Bounds(2, 4, 0)
+        with self.assertRaises(ValueError):
+            auc.Bounds(2, 4, 0)
 
-    @unittest.expectedFailure
     def test_bad_bounds(self):
         """run test method"""
-        auc.Bounds(2, 2, 1)
+        with self.assertRaises(ValueError):
+            auc.Bounds(2, 2, 1)
 
 
 class PolynomialTest(unittest.TestCase):
@@ -36,31 +36,40 @@ class PolynomialTest(unittest.TestCase):
     def test_int_ok(self):
         """Correctly evaluate valid polynomial"""
         polynomial_ok = auc.Polynomial({2:3, 1:4, 0:5})
+        print(polynomial_ok)
         assert polynomial_ok.evaluate(-2) == 9
         assert polynomial_ok.evaluate(0) == 5
         assert polynomial_ok.evaluate(2) == 25
 
+    def test_zero_ok(self):
+        """Correctly evaluate valid polynomial"""
+        polynomial_ok = auc.Polynomial({0:0})
+        print(polynomial_ok)
+
     def test_frac_ok(self):
         """Correctly evaluate valid polynomial"""
         polynomial_ok = auc.Polynomial({1.5:1})
+        print(polynomial_ok)
         assert polynomial_ok.evaluate(0) == 0
         assert polynomial_ok.evaluate(2) == 2 * math.sqrt(2)
 
-    @unittest.expectedFailure
+ 
     def test_fraction_reject(self):
         """Don't evaluate negative input with fractional exponents"""
-        polynomial_reject_fraction = auc.Polynomial({2.5, 1})
-        polynomial_reject_fraction.evaluate(-2)
+        with self.assertRaises(ValueError):
+            polynomial_reject_fraction = auc.Polynomial({2.5:1})
+            polynomial_reject_fraction.evaluate(-2)
 
-    @unittest.expectedFailure
+
     def test_negative_exp_reject(self):
         """Don't support negative exponents"""
-        auc.Polynomial({-2, 1})
+        with self.assertRaises(ValueError):
+            auc.Polynomial({-2:1})
 
-    @unittest.expectedFailure
     def test_negative_exp_frac_reject(self):
         """Don't support negative exponents"""
-        auc.Polynomial({-2.5, 1})
+        with self.assertRaises(ValueError):
+            auc.Polynomial({-2.5: 1})
 
 
 class ParseArgumentsTest(unittest.TestCase):
@@ -89,6 +98,10 @@ class ParseArgumentsTest(unittest.TestCase):
         parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-s", "-1"])
         assert parsed_params == None
 
+    def test_invalid_bounds(self):
+        parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-l", "1", "-u", "0"])
+        assert parsed_params == None
+
     def test_invalid_polynomial_set(self):
         parsed_params = auc.parse_arguments(["-p", "{3-1}", "-s", ".2", "-a", "simpson"])
         assert parsed_params == None
@@ -104,6 +117,16 @@ class ParseArgumentsTest(unittest.TestCase):
     def test_invalid_option(self):
         parsed_params = auc.parse_arguments(["-z", "3"])
         assert parsed_params == None     
+
+    def test_invalid_number(self):
+        parsed_params = auc.parse_arguments(["-l", "x3"])
+        assert parsed_params == None     
+
+    def test_help(self):
+        try:
+            parsed_params = auc.parse_arguments(["-h"])   
+        except SystemExit as ex_err:
+            print("System exited as expected")
 
 
 class AreaTest(unittest.TestCase):
@@ -127,7 +150,7 @@ class AreaTest(unittest.TestCase):
     def test_simple_area_3(self):
         bounds = auc.Bounds(-5, 5, .1)
         polynomial = auc.Polynomial({3:1}) # f(x) = x^3
-        algorithm = auc.get_algorithm("simpson")
+        algorithm = auc.get_algorithm("midpoint")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
         print(area)
         self.assertAlmostEqual(area, 0)

@@ -181,8 +181,6 @@ def parse_arguments(argv):
             algorithm = arg
         elif opt in ("-p", "--polynomial"):
             polynomial_coefficients = parse_polynomial_coefficients(arg)
-        else:
-            log("?")
         if step_size <= 0:
             log("step size must be > 0: {}".format(step_size))
             return
