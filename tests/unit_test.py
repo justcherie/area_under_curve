@@ -1,7 +1,12 @@
 #!python3
 import math
+import sys
 import unittest
-import __init__ as auc
+
+sys.path.insert(0, '../area_under_curve/')
+
+import area_under_curve as auc
+
 
 class BoundsTest(unittest.TestCase):
     """Test class for Bounds class"""

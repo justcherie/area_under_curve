@@ -19,7 +19,7 @@ area\_under\_curve
 
 example:
 
-``python area_under_curve\__init__.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
+``python area_under_curve.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
 
 or:
 
