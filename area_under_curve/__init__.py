@@ -52,10 +52,10 @@ class Polynomial:
         self.fractional_exponents = False
 
         self.coefficient_dict = coefficient_dict
-        if any(map(lambda n: n < 0, coefficient_dict.keys())):
+        if any_negative(coefficient_dict.keys()):
             raise ValueError("Only positive exponents supported")
 
-        if any(map(lambda n: not isinstance(n, int), coefficient_dict.keys())):
+        if any_non_int_numbers(coefficient_dict.keys()):
             self.fractional_exponents = True
 
     def format_term(self, degree, value):
@@ -100,7 +100,7 @@ class Polynomial:
 
 def parse_polynomial_coefficients(dict_literal):
     """Try to parse string into dictionary, return None on failure"""
-    try:
+    try:  # Need more validation here!
         return ast.literal_eval(dict_literal)
     except ValueError as err:
         log("Error parsing polynomial args: {} {}".format(dict_literal, str(err)))
@@ -121,6 +121,14 @@ def is_number(string):
         log("Error: {} {}".format(string, str(err)))
         return False
 
+def any_non_int_numbers(collection):
+    """Returns true if any numbers in the collection are not integers"""
+    return any(map(lambda n: not isinstance(n, int), collection))
+
+def any_negative(collection):
+    """Returns true if any numbers in the collection are < 0"""
+    return any(map(lambda n: n < 0, collection))
+    
 def has_property(name):
     """Simple function property decorator"""
     def wrap(func):
@@ -142,12 +150,9 @@ def parse_arguments(argv):
         opts, args = getopt.getopt(argv, "hl:u:s:a:p:",
                                    ["lower=", "upper=", "step=",
                                     "algorithm=", "polynomial=", "help"])
-        numerical_params = list(filter(lambda t: t[0] != '-a' and
-                                       t[0] != '-h' and
-                                       t[0] != '--help' and
-                                       t[0] != '--algorithm' and
-                                       t[0] != "-p" and
-                                       t[0] != "--polynomial", opts))
+
+        non_numerical_params = ["-a", "--algorithm", "-p", "--polynomial", "-h", "--help"]
+        numerical_params = list(filter(lambda t: t[0] not in non_numerical_params, opts))
         if any(map(lambda n: not is_number(n[1]), numerical_params)):
             log("Error in numerical arguments.")
             return
@@ -176,14 +181,14 @@ def parse_arguments(argv):
         if lower >= upper:
             log("invalid bounds: {} {}".format(lower, upper))
             return
-        if (lower < 0 or upper < 0) and any(map(lambda n: not isinstance(n, int), polynomial_coefficients.keys())):
+        if (lower < 0 or upper < 0) and any_non_int_numbers(polynomial_coefficients.keys()):
             log("Fractional exponents not supported for negative values.")
             return
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
         log("Algorithm : {} not found!".format(algorithm))
-        return
-    if any(map(lambda n: n < 0, polynomial_coefficients.keys())):
+        return 
+    if any_negative(polynomial_coefficients.keys()):
         log("Only positive exponents supported")
         return
     if not polynomial_coefficients:
