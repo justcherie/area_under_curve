@@ -84,5 +84,21 @@ class ParseArgumentsTest(unittest.TestCase):
         parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-s", "-1"])
         assert parsed_params == None
 
+    def test_invalid_polynomial_set(self):
+        parsed_params = auc.parse_arguments(["-p", "{3-1}", "-s", ".2", "-a", "simpson"])
+        assert parsed_params == None
+
+    def test_invalid_polynomial_numeric_s(self):
+        parsed_params = auc.parse_arguments(["-p", "{3a:2}"])
+        assert parsed_params == None
+
+    def test_invalid_polynomial_numeric_v(self):
+        parsed_params = auc.parse_arguments(["-p", "{3:2a}"])
+        assert parsed_params == None
+
+    def test_invalid_option(self):
+        parsed_params = auc.parse_arguments(["-z", "3"])
+        assert parsed_params == None     
+
 if __name__ == "__main__":
     unittest.main()

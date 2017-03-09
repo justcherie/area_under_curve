@@ -100,11 +100,19 @@ class Polynomial:
 
 def parse_polynomial_coefficients(dict_literal):
     """Try to parse string into dictionary, return None on failure"""
+    coefficient_dict = {}
     try:  # Need more validation here!
-        return ast.literal_eval(dict_literal)
-    except ValueError as err:
-        log("Error parsing polynomial args: {} {}".format(dict_literal, str(err)))
+        coefficient_dict = ast.literal_eval(dict_literal)
+    except SyntaxError as errs:
+        log("Syntax Error parsing polynomial args: {} {}".format(dict_literal, str(errs)))
+    except ValueError as errv:
+        log("Value Error parsing polynomial args: {} {}".format(dict_literal, str(errv)))
         return None
+    if not isinstance(coefficient_dict, dict):
+        log("Malformed dictionary: {}".format(coefficient_dict))
+        return None
+    else:
+        return coefficient_dict
 
 
 def log(string):
@@ -128,7 +136,7 @@ def any_non_int_numbers(collection):
 def any_negative(collection):
     """Returns true if any numbers in the collection are < 0"""
     return any(map(lambda n: n < 0, collection))
-    
+
 def has_property(name):
     """Simple function property decorator"""
     def wrap(func):
@@ -187,12 +195,12 @@ def parse_arguments(argv):
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
         log("Algorithm : {} not found!".format(algorithm))
-        return 
-    if any_negative(polynomial_coefficients.keys()):
-        log("Only positive exponents supported")
         return
     if not polynomial_coefficients:
         log("Polynomial not specified or invalid")
+        return
+    if any_negative(polynomial_coefficients.keys()):
+        log("Only positive exponents supported")
         return
     return get_parameters(polynomial_coefficients,
                           lower, upper, step_size, algorithm_function)
