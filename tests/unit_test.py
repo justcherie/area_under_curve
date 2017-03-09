@@ -105,5 +105,32 @@ class ParseArgumentsTest(unittest.TestCase):
         parsed_params = auc.parse_arguments(["-z", "3"])
         assert parsed_params == None     
 
+
+class AreaTest(unittest.TestCase):
+    """Test class for parsing command line arguments """
+    def test_simple_area_1(self):
+        bounds = auc.Bounds(0, 10, .1)
+        polynomial = auc.Polynomial({1:1}) # f(x) = x
+        algorithm = auc.get_algorithm("trapezoid")
+        area = auc.area_under_curve(polynomial, bounds, algorithm)
+        print(area)
+        self.assertAlmostEqual(area, 50)
+
+    def test_simple_area_2(self):
+        bounds = auc.Bounds(0, 10, .1)
+        polynomial = auc.Polynomial({2:1}) # f(x) = x^2
+        algorithm = auc.get_algorithm("simpson")
+        area = auc.area_under_curve(polynomial, bounds, algorithm)
+        print(area)
+        self.assertAlmostEqual(area, 1000/3)
+
+    def test_simple_area_3(self):
+        bounds = auc.Bounds(-5, 5, .1)
+        polynomial = auc.Polynomial({3:1}) # f(x) = x^3
+        algorithm = auc.get_algorithm("simpson")
+        area = auc.area_under_curve(polynomial, bounds, algorithm)
+        print(area)
+        self.assertAlmostEqual(area, 0)
+
 if __name__ == "__main__":
     unittest.main()
