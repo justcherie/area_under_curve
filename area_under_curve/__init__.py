@@ -49,9 +49,14 @@ class Polynomial:
             f(x) = 3x^2 would be expressed as {2:3}
             f(x) = 9x^5 + 3 would be {5:9, 0:3}
         """
+        self.fractional_exponents = False
+
         self.coefficient_dict = coefficient_dict
         if any(map(lambda n: n < 0, coefficient_dict.keys())):
             raise ValueError("Only positive exponents supported")
+
+        if any(map(lambda n: not isinstance(n, int), coefficient_dict.keys())):
+            self.fractional_exponents = True
 
     def format_term(self, degree, value):
         """string format a single term"""
@@ -86,7 +91,10 @@ class Polynomial:
         """Evaluate the polynomial at a given value"""
         total = 0
         for degree in self.coefficient_dict:
-            current_term = math.pow(value, degree)* self.coefficient_dict[degree]
+            coefficient = self.coefficient_dict[degree]
+            if self.fractional_exponents and value < 0:
+                raise ValueError("Fractional exponents not supported for negative inputs.")
+            current_term = math.pow(value, degree)* coefficient
             total += current_term
         return total
 
@@ -168,7 +176,9 @@ def parse_arguments(argv):
         if lower >= upper:
             log("invalid bounds: {} {}".format(lower, upper))
             return
-
+        if (lower < 0 or upper < 0) and any(map(lambda n: not isinstance(n, int), polynomial_coefficients.keys())):
+            log("Fractional exponents not supported for negative values.")
+            return
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
         log("Algorithm : {} not found!".format(algorithm))
