@@ -17,7 +17,7 @@ USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}
   defaults: step_size:1, lower_bound:0, upper_bound:10, algorithm:trapezoid
 
 e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and the midpoint algorithm:
- python __init__.py --poly "{2:1, 1:2, 0:-2}" --lower 1 --upper 50 --step .1 --algorithm midpoint
+ python area_under_curve.py --poly "{2:1, 1:2, 0:-2}" --lower 1 --upper 50 --step .1 --algorithm midpoint
 """
 
 FULL_USAGE = USAGE
