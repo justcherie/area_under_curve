@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, '../area_under_curve/')
 
 import area_under_curve as auc
-
+#auc.LOGGING = False
 
 class BoundsTest(unittest.TestCase):
     """Test class for Bounds class"""
@@ -154,6 +154,20 @@ class AreaTest(unittest.TestCase):
         area = auc.area_under_curve(polynomial, bounds, algorithm)
         print(area)
         self.assertAlmostEqual(area, 0)
+
+class EntryPointTest(unittest.TestCase):
+    """Test main entrypoint"""
+    def test_entrypoint_ok(self):
+        """Test valid command line"""
+        auc.main_entry(["area_under_curve.py", "-p", "{3:1}"])
+    
+    """Test main entrypoint"""
+    def test_entrypoint_invalid(self):
+        """Test invalid command line"""
+        with self.assertRaises(SystemExit):
+            auc.main_entry(["area_under_curve.py", "-p", "{a}"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
