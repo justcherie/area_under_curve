@@ -2,6 +2,6 @@ include LICENSE
 include README.rst
 include area_under_curve.py
 include tests/unit_test.py
-inclue tests/demo.py
+include tests/demo.py
 
 prune p3
