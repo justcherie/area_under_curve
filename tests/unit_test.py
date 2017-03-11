@@ -6,19 +6,17 @@ import unittest
 sys.path.insert(0, '../area_under_curve/')
 
 import area_under_curve as auc
-#auc.LOGGING = False
+auc.LOGGING = False
 
 class BoundsTest(unittest.TestCase):
     """Test class for Bounds class"""
     def test_ok(self):
         """run test method"""
         bounds_ok = auc.Bounds(2, 4, .1)
-        #print(bounds_ok)
         assert bounds_ok.lower_bound == 2
         assert bounds_ok.upper_bound == 4
         assert bounds_ok.step_size == .1
         assert len(bounds_ok.full_range) == 21
-        #print(bounds_ok.full_range)
 
     def test_bad_step_size(self):
         """run test method"""
@@ -29,27 +27,40 @@ class BoundsTest(unittest.TestCase):
         """run test method"""
         with self.assertRaises(ValueError):
             auc.Bounds(2, 2, 1)
-
+    
+    def test_bounds_string_rep(self):
+        bounds = auc.Bounds(-2, 2.5,.1)
+        bounds_str = str(bounds)
+        assert bounds_str == "Bounds: [-2 - 2.5], step_size: 0.1"
 
 class PolynomialTest(unittest.TestCase):
     """Test class for Bounds class"""
     def test_int_ok(self):
         """Correctly evaluate valid polynomial"""
         polynomial_ok = auc.Polynomial({2:3, 1:4, 0:5})
-        print(polynomial_ok)
         assert polynomial_ok.evaluate(-2) == 9
         assert polynomial_ok.evaluate(0) == 5
         assert polynomial_ok.evaluate(2) == 25
 
+    def test_string_rep_ok_1(self):
+        polynomial_1 = auc.Polynomial({0:-2.5, 1:1.5, 3:2, 4:1})
+        assert str(polynomial_1) == "f(x)=x^4 + 2x^3 + 1.5x + -2.5"
+
     def test_zero_ok(self):
         """Correctly evaluate valid polynomial"""
         polynomial_ok = auc.Polynomial({0:0})
-        print(polynomial_ok)
+        assert polynomial_ok.evaluate(5) == 0
+        assert str(polynomial_ok) == "f(x)=0"
+
+    def test_constant_ok(self):
+        """Correctly evaluate valid polynomial"""
+        polynomial_ok = auc.Polynomial({0:5})
+        assert polynomial_ok.evaluate(3) == 5
+        assert str(polynomial_ok) == "f(x)=5"
 
     def test_frac_ok(self):
         """Correctly evaluate valid polynomial"""
         polynomial_ok = auc.Polynomial({1.5:1})
-        print(polynomial_ok)
         assert polynomial_ok.evaluate(0) == 0
         assert polynomial_ok.evaluate(2) == 2 * math.sqrt(2)
 
@@ -126,7 +137,7 @@ class ParseArgumentsTest(unittest.TestCase):
         try:
             parsed_params = auc.parse_arguments(["-h"])   
         except SystemExit as ex_err:
-            print("System exited as expected")
+            return
 
 
 class AreaTest(unittest.TestCase):
@@ -136,7 +147,6 @@ class AreaTest(unittest.TestCase):
         polynomial = auc.Polynomial({1:1}) # f(x) = x
         algorithm = auc.get_algorithm("trapezoid")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
-        print(area)
         self.assertAlmostEqual(area, 50)
 
     def test_simple_area_2(self):
@@ -144,7 +154,6 @@ class AreaTest(unittest.TestCase):
         polynomial = auc.Polynomial({2:1}) # f(x) = x^2
         algorithm = auc.get_algorithm("simpson")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
-        print(area)
         self.assertAlmostEqual(area, 1000/3)
 
     def test_simple_area_3(self):
@@ -152,7 +161,6 @@ class AreaTest(unittest.TestCase):
         polynomial = auc.Polynomial({3:1}) # f(x) = x^3
         algorithm = auc.get_algorithm("midpoint")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
-        print(area)
         self.assertAlmostEqual(area, 0)
 
 class EntryPointTest(unittest.TestCase):
