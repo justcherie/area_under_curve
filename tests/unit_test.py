@@ -23,10 +23,20 @@ class BoundsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             auc.Bounds(2, 4, 0)
 
+    def test_bad_step_size_2(self):
+        """reject invalid step size"""
+        with self.assertRaises(ValueError):
+            auc.Bounds(2, 4, -.1)
+
     def test_bad_bounds(self):
         """reject if lower bound <= upper bound"""
         with self.assertRaises(ValueError):
             auc.Bounds(2, 2, 1)
+
+    def test_bad_bounds_2(self):
+        """reject if lower bound <= upper bound"""
+        with self.assertRaises(ValueError):
+            auc.Bounds(2, 1, 1)
 
     def test_bounds_string_rep(self):
         """test string representation of bounds"""
@@ -54,6 +64,11 @@ class PolynomialTest(unittest.TestCase):
         assert polynomial_ok.evaluate(5) == 0
         assert str(polynomial_ok) == "f(x)=0"
 
+    def test_string_rep_ok_2(self):
+        """test string reprentation of polynomial"""
+        polynomial_1 = auc.Polynomial({0:5})
+        assert str(polynomial_1) == "f(x)=5"
+
     def test_constant_ok(self):
         """correctly evaluate valid polynomial f(x)=c"""
         polynomial_ok = auc.Polynomial({0:5})
@@ -67,18 +82,18 @@ class PolynomialTest(unittest.TestCase):
         assert polynomial_ok.evaluate(2) == 2 * math.sqrt(2)
 
     def test_fraction_reject(self):
-        """don't evaluate negative input with fractional exponents"""
+        """reject negative input with fractional exponents"""
         with self.assertRaises(ValueError):
             polynomial_reject_fraction = auc.Polynomial({2.5:1})
             polynomial_reject_fraction.evaluate(-2)
 
     def test_negative_exp_reject(self):
-        """don't support negative exponents"""
+        """reject negative exponents"""
         with self.assertRaises(ValueError):
             auc.Polynomial({-2:1})
 
     def test_negative_exp_frac_reject(self):
-        """don't support negative exponents"""
+        """reject negative fractional exponents"""
         with self.assertRaises(ValueError):
             auc.Polynomial({-2.5: 1})
 
@@ -86,7 +101,7 @@ class PolynomialTest(unittest.TestCase):
 class ParseArgumentsTest(unittest.TestCase):
     """Test class for parsing command line arguments """
     def test_ok(self):
-        """basic argument test"""
+        """basic successful argument test"""
         parsed_params = auc.parse_arguments(["-p", "{3:2}", "-s", ".2", "-a",
                                              "simpson", "-l", "-2", "-u", "1.5"])
         assert parsed_params.bounds.step_size == .2
@@ -96,7 +111,7 @@ class ParseArgumentsTest(unittest.TestCase):
         assert parsed_params.algorithm.__name__ == "simpson"
 
     def test_invalid_algorithm(self):
-        """test for incorrect algorithm name"""
+        """reject incorrect algorithm name"""
         parsed_params = auc.parse_arguments(["-p", "{3:2}", "-s", ".2", "-a", "simpsonx"])
         assert parsed_params is None
 
@@ -106,7 +121,7 @@ class ParseArgumentsTest(unittest.TestCase):
         assert parsed_params is None
 
     def test_fractional_exponent_negative_value(self):
-        """don't allow fractional exponents with negative bounds"""
+        """reject fractional exponents with negative bounds"""
         parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-s", ".2",
                                              "-l", "-5", "-a", "simpson"])
         assert parsed_params is None
@@ -184,10 +199,11 @@ class EntryPointTest(unittest.TestCase):
     """Test main entrypoint"""
     def test_entrypoint_ok(self):
         """test valid command line"""
-        auc.area_under_curve_argv(["area_under_curve.py", "-p", "{3:1}"])
+        auc.area_under_curve_argv(["area_under_curve.py", "-p", "{3:1}", "-l", "0",
+                                   "-u", "10", "-s", ".1", "-a", "simpson"])
 
     def test_entrypoint_invalid(self):
-        """test invalid command line"""
+        """reject invalid command line"""
         with self.assertRaises(SystemExit):
             auc.area_under_curve_argv(["area_under_curve.py", "-p", "{a}"])
 

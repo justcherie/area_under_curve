@@ -1,11 +1,14 @@
 area\_under\_curve
 ==================
 
--  Python 3 module to calculate area under a curve
--  Supports simpson, trapezoid, and midpoint algorithms, n-degree single variable polynomials, and
-   variable step size
+-  Python 3 module to calculate riemann sum area under a curve
+-  Supports
 
--  https://github.com/smycynek/area\_under\_curve/
+   -  simpson, trapezoid, and midpoint algorithms,
+   -  n-degree single variable polynomials, including fractional exponents,
+   -  variable step size
+
+-  https://github.com/smycynek/area-under-curve/
 
 ``USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}...``
 ``-l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step>``
@@ -17,7 +20,8 @@ area\_under\_curve
    compare that to how accurate the midpoint, trapezoid, and simpson approximations are with various
    steps sizes.
 
-example:
+examples:
+---------
 
 ``python area_under_curve.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
 
@@ -37,4 +41,4 @@ or:
 
 ``print(str(AREA))``
 
-Also try out ``unit_test.py``.
+Also try out ``unit_test.py`` and ``demo.py``.
