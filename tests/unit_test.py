@@ -159,13 +159,13 @@ class EntryPointTest(unittest.TestCase):
     """Test main entrypoint"""
     def test_entrypoint_ok(self):
         """Test valid command line"""
-        auc.main_entry(["area_under_curve.py", "-p", "{3:1}"])
+        auc.area_under_curve_argv(["area_under_curve.py", "-p", "{3:1}"])
     
     """Test main entrypoint"""
     def test_entrypoint_invalid(self):
         """Test invalid command line"""
         with self.assertRaises(SystemExit):
-            auc.main_entry(["area_under_curve.py", "-p", "{a}"])
+            auc.area_under_curve_argv(["area_under_curve.py", "-p", "{a}"])
 
 
 

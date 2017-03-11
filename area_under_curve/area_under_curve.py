@@ -256,7 +256,7 @@ def area_under_curve(poly, bounds, algorithm):
             total_area += algorithm(poly, val, bounds.full_range[range_index + 1])
 
 
-def main_entry(args):
+def area_under_curve_argv(args):
     """Command-line entrypoint"""
     full_usage = '{}\nUsage: python {} {}'.format(__doc__, args[0], USAGE)
     parsed_parameters = parse_arguments(args[1:])
@@ -269,4 +269,4 @@ def main_entry(args):
 
 
 if __name__ == '__main__':
-    main_entry(sys.argv)
+    area_under_curve_argv(sys.argv)
