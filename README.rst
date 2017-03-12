@@ -35,7 +35,7 @@ or:
 
 ``polynomial = auc.Polynomial({3:1})``
 
-``params = auc.Parameters._make([polynomial, bounds, algorithm])``
+``params = auc.Parameters(polynomial, bounds, algorithm)``
 
 ``AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)``
 

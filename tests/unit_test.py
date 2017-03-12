@@ -102,7 +102,7 @@ class ParseArgumentsTest(unittest.TestCase):
     """Test class for parsing command line arguments """
     def test_ok(self):
         """basic successful argument test"""
-        parsed_params = auc.parse_arguments(["-p", "{3:2}", "-s", ".2", "-a",
+        parsed_params = auc.parse_commandline_arguments(["-p", "{3:2}", "-s", ".2", "-a",
                                              "simpson", "-l", "-2", "-u", "1.5"])
         assert parsed_params.bounds.step_size == .2
         assert parsed_params.bounds.lower_bound == -2
@@ -112,59 +112,59 @@ class ParseArgumentsTest(unittest.TestCase):
 
     def test_invalid_algorithm(self):
         """reject incorrect algorithm name"""
-        parsed_params = auc.parse_arguments(["-p", "{3:2}", "-s", ".2", "-a", "simpsonx"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{3:2}", "-s", ".2", "-a", "simpsonx"])
         assert parsed_params is None
 
     def test_negative_exponent(self):
         """reject negative exponents"""
-        parsed_params = auc.parse_arguments(["-p", "{-3:2}", "-s", ".2", "-a", "simpson"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{-3:2}", "-s", ".2", "-a", "simpson"])
         assert parsed_params is None
 
     def test_fractional_exponent_negative_value(self):
         """reject fractional exponents with negative bounds"""
-        parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-s", ".2",
+        parsed_params = auc.parse_commandline_arguments(["-p", "{1.5:2}", "-s", ".2",
                                              "-l", "-5", "-a", "simpson"])
         assert parsed_params is None
 
     def test_invalid_step(self):
         """reject step size <=0"""
-        parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-s", "-1"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{1.5:2}", "-s", "-1"])
         assert parsed_params is None
 
     def test_invalid_bounds(self):
         """reject lower bound > upper bound"""
-        parsed_params = auc.parse_arguments(["-p", "{1.5:2}", "-l", "1", "-u", "0"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{1.5:2}", "-l", "1", "-u", "0"])
         assert parsed_params is None
 
     def test_invalid_polynomial_set(self):
         """reject invalid polynomial string"""
-        parsed_params = auc.parse_arguments(["-p", "{3-1}", "-s", ".2", "-a", "simpson"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{3-1}", "-s", ".2", "-a", "simpson"])
         assert parsed_params is None
 
     def test_invalid_polynomial_numeric_s(self):
         """reject invalid polynomial string"""
-        parsed_params = auc.parse_arguments(["-p", "{3a:2}"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{3a:2}"])
         assert parsed_params is None
 
     def test_invalid_polynomial_numeric_v(self):
         """reject invalid polynomial string"""
-        parsed_params = auc.parse_arguments(["-p", "{a}"])
+        parsed_params = auc.parse_commandline_arguments(["-p", "{a}"])
         assert parsed_params is None
 
     def test_invalid_option(self):
         """reject invalid option"""
-        parsed_params = auc.parse_arguments(["-z", "3"])
+        parsed_params = auc.parse_commandline_arguments(["-z", "3"])
         assert parsed_params is None
 
     def test_invalid_number(self):
         """reject invalid numerical argument"""
-        parsed_params = auc.parse_arguments(["-l", "x3"])
+        parsed_params = auc.parse_commandline_arguments(["-l", "x3"])
         assert parsed_params is None
 
     def test_help(self):
         """test help string"""
         try:
-            auc.parse_arguments(["-h"])
+            auc.parse_commandline_arguments(["-h"])
         except SystemExit:
             return
 

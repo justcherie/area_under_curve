@@ -3,7 +3,6 @@
 midpoint algorithms,  n-degree single variable polynomials, and variable step size
 """
 import ast
-import collections
 import getopt
 import math
 import sys
@@ -21,25 +20,6 @@ e.g. To evaluate the area of y=x^2 + 2x -2 from [1-50] with .1 width sums and th
 """
 
 FULL_USAGE = USAGE
-
-Parameters = collections.namedtuple("Parameters", ["polynomial", "bounds", "algorithm"])
-
-class Bounds:
-    """Range of values class"""
-    def __init__(self, lower_bound, upper_bound, step_size):
-        self.lower_bound = lower_bound
-        self.upper_bound = upper_bound
-        self.step_size = step_size
-        if step_size <= 0:
-            raise ValueError("step size must be > 0")
-        if upper_bound <= lower_bound:
-            raise ValueError("invalid bounds")
-        self.full_range = numpy.arange(lower_bound, upper_bound + step_size, step_size).tolist()
-
-    def __str__(self):
-        return "Bounds: [{} - {}], step_size: {}".format(
-            self.lower_bound, self.upper_bound, self.step_size)
-
 
 class Polynomial:
     """Single variable polynomial class supporting n degrees"""
@@ -98,23 +78,38 @@ class Polynomial:
             total += current_term
         return total
 
-def parse_polynomial_coefficients(dict_literal):
-    """Try to parse string into dictionary, return None on failure"""
-    coefficient_dict = {}
-    try:  # Need more validation here!
-        coefficient_dict = ast.literal_eval(dict_literal)
-    except SyntaxError as errs:
-        log("Syntax Error parsing polynomial args: {} {}".format(dict_literal, str(errs)))
-    except ValueError as errv:
-        log("Value Error parsing polynomial args: {} {}".format(dict_literal, str(errv)))
-        return None
-    if not isinstance(coefficient_dict, dict):
-        log("Malformed dictionary: {}".format(coefficient_dict))
-        return None
-    else:
-        return coefficient_dict
+class Bounds:
+    """Range of values class"""
+    def __init__(self, lower_bound, upper_bound, step_size):
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.step_size = step_size
+        if step_size <= 0:
+            raise ValueError("step size must be > 0")
+        if upper_bound <= lower_bound:
+            raise ValueError("invalid bounds")
+        self.full_range = numpy.arange(lower_bound, upper_bound + step_size, step_size).tolist()
+
+    def __str__(self):
+        return "Bounds: [{} - {}], step_size: {}".format(
+            self.lower_bound, self.upper_bound, self.step_size)
+
+class Parameters:
+    """Contains several groups of parameters"""
+    def __init__(self, polynomial, bounds, algorithm):
+        self.polynomial = polynomial
+        self.bounds = bounds
+        self.algorithm = algorithm
+
+    @classmethod
+    def factory(cls, polynomial_coefficients, lower, upper, step, algorithm):
+        """Create parameters object from polynomial, bounds, and algorithm parameters"""
+        bounds = Bounds(lower, upper, step)
+        polynomial = Polynomial(polynomial_coefficients)
+        return Parameters(polynomial, bounds, algorithm)
 
 
+# Misc helper functions
 def log(string):
     """Simple logging"""
     if LOGGING:
@@ -145,10 +140,12 @@ def has_property(name):
         return func
     return wrap
 
-def parse_arguments(argv):
+# Argument parsing
+def parse_commandline_arguments(argv):
     """Parse command line arguments and return a parameters
     object with Bounds, Polynomial, and Algorithm
     """
+    #defaults
     lower = 0
     upper = 10
     step_size = 1
@@ -200,24 +197,27 @@ def parse_arguments(argv):
     if any_negative(polynomial_coefficients.keys()):
         log("Only positive exponents supported")
         return
-    return get_parameters(polynomial_coefficients,
-                          lower, upper, step_size, algorithm_function)
+    return Parameters.factory(polynomial_coefficients,
+                              lower, upper, step_size, algorithm_function)
 
-def get_parameters(polynomial_coefficients, lower, upper, step, algorithm):
-    """Create parameters tuple from polynomial, bounds, and algorithm parameters"""
-    bounds = Bounds(lower, upper, step)
-    polynomial = Polynomial(polynomial_coefficients)
-    return Parameters._make([polynomial, bounds, algorithm])
 
-def get_algorithm(algorithm_name):
-    """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""
-    if algorithm_name in globals():
-        algorithm = globals()[algorithm_name]
-        if "algorithm" in dir(algorithm):
-            return globals()[algorithm_name]
+def parse_polynomial_coefficients(dict_literal):
+    """Try to parse string into dictionary, return None on failure"""
+    coefficient_dict = {}
+    try:
+        coefficient_dict = ast.literal_eval(dict_literal)
+    except SyntaxError as errs:
+        log("Syntax Error parsing polynomial args: {} {}".format(dict_literal, str(errs)))
+    except ValueError as errv:
+        log("Value Error parsing polynomial args: {} {}".format(dict_literal, str(errv)))
+        return None
+    if not isinstance(coefficient_dict, dict):
+        log("Malformed dictionary: {}".format(coefficient_dict))
+        return None
     else:
-        log("Algorithm {} not found or invalid!".format(algorithm_name))
+        return coefficient_dict
 
+# Algorithms and utilities
 @has_property("algorithm")
 def midpoint(poly, lower, upper):
     """Calculate midpoint slice from two polynomial evaluations and step size"""
@@ -239,12 +239,23 @@ def simpson(poly, lower, upper):
     midpoint_value = poly.evaluate((lower+upper)/2)
     return ((upper - lower) / 6) * (lower_value + 4 * midpoint_value + upper_value)
 
+def get_algorithm(algorithm_name):
+    """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""
+    if algorithm_name in globals():
+        algorithm = globals()[algorithm_name]
+        if "algorithm" in dir(algorithm):
+            return globals()[algorithm_name]
+    else:
+        log("Algorithm {} not found or invalid!".format(algorithm_name))
+
+
+# High-level implementation
 def area_under_curve(poly, bounds, algorithm):
     """Finds the area under a polynomial between the specified bounds
     using a rectangle-sum (of width 1) approximation.
     """
-    log(bounds)
     log(poly)
+    log(bounds)
     log("Algorithm: {}".format(algorithm.__name__))
     range_upper_index = len(bounds.full_range) - 1
     total_area = 0
@@ -258,7 +269,7 @@ def area_under_curve(poly, bounds, algorithm):
 
 def area_under_curve_argv(args):
     """Command-line entrypoint"""
-    parsed_parameters = parse_arguments(args[1:])
+    parsed_parameters = parse_commandline_arguments(args[1:])
     if not parsed_parameters:
         log(FULL_USAGE)
         exit(2)

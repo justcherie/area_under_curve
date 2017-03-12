@@ -1,5 +1,5 @@
 # area_under_curve
-* Version 0.9.6
+* Version 0.9.7
 * Python 3 module to calculate riemann sum area under a curve
 * Copyright 2017 Steven Mycynek
 * Supports 
@@ -31,7 +31,7 @@ or:
 
 `polynomial = auc.Polynomial({3:1})`
 
-`params = auc.Parameters._make([polynomial, bounds, algorithm])`
+`params = auc.Parameters(polynomial, bounds, algorithm)`
 
 `AREA = auc.area_under_curve(params.polynomial, params.bounds, params.algorithm)`
 
