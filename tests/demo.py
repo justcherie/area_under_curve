@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/env python
 """Simple test with logging"""
 import sys
 

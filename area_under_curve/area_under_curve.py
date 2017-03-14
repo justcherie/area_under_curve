@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/env python
 """Find approximate area under curve:  Supports simpson, trapezoid, and
 midpoint algorithms,  n-degree single variable polynomials, and variable step size
 """
@@ -266,7 +266,7 @@ def area_under_curve(poly, bounds, algorithm):
         else:
             total_area += algorithm(poly, val, bounds.full_range[range_index + 1])
 
-
+# Entrypoints
 def area_under_curve_argv(args):
     """Command-line entrypoint"""
     parsed_parameters = parse_commandline_arguments(args[1:])

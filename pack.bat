@@ -1,3 +1,4 @@
 del /q dist\*.*
-
-python setup.py sdist bdist_wheel
+del /q build\*.*
+del /q area_under_curve.egg-info\*.*
+python setup.py sdist bdist_wheel --universal

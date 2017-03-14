@@ -1,7 +1,7 @@
 area\_under\_curve
 ==================
 
--  Python 3 module to calculate riemann sum area under a curve
+-  Python 2.7/3.5+ module to calculate riemann sum area under a curve
 -  Supports
 
    -  simpson, trapezoid, and midpoint algorithms,

@@ -1,4 +1,5 @@
-#!python3
+#!/usr/bin/env python
+"""Unit tests"""
 import math
 import sys
 import unittest
@@ -185,7 +186,7 @@ class AreaTest(unittest.TestCase):
         polynomial = auc.Polynomial({2:1}) # f(x) = x^2
         algorithm = auc.get_algorithm("simpson")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
-        self.assertAlmostEqual(area, 1000/3)
+        self.assertAlmostEqual(area, 1000.0/3.0)
 
     def test_simple_area_3(self):
         """area test 3"""
