@@ -17,7 +17,24 @@ class BoundsTest(unittest.TestCase):
         assert bounds_ok.lower_bound == 2
         assert bounds_ok.upper_bound == 4
         assert bounds_ok.step_size == .1
-        assert len(bounds_ok.full_range) == 21
+        assert len(bounds_ok.full_range) == 20
+
+    def test_bounds_ok2(self):
+        """basic bounds check"""
+        bounds_ok = auc.Bounds(0, 100, .01)
+        assert bounds_ok.lower_bound == 0
+        assert bounds_ok.upper_bound == 100
+        assert bounds_ok.step_size == .01
+        assert len(bounds_ok.full_range) == 10000
+
+    def test_bounds_ok3(self):
+        """Check that large step sizes don't cause roundoff error problems"""
+        bounds_ok = auc.Bounds(0, 5, 1)
+        assert bounds_ok.lower_bound == 0
+        assert bounds_ok.upper_bound == 5
+        assert bounds_ok.step_size == 1
+        assert len(bounds_ok.full_range) == 6 #[0,1,2,3,4,5]
+
 
     def test_bad_step_size(self):
         """reject invalid step size"""

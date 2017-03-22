@@ -6,7 +6,7 @@ import ast
 import getopt
 import math
 import sys
-import numpy
+
 
 LOGGING = True # Typically set to false when not using interactively
 
@@ -32,11 +32,10 @@ class Polynomial:
         self.fractional_exponents = False
 
         self.coefficient_dict = coefficient_dict
-        if any_negative(coefficient_dict.keys()):
+        if any_negative(coefficient_dict):
             raise ValueError("Only positive exponents supported")
 
-        if any_non_int_numbers(coefficient_dict.keys()):
-            self.fractional_exponents = True
+        self.fractional_exponents = any_non_int_numbers(coefficient_dict)
 
     def format_term(self, degree, value):
         """string format a single term"""
@@ -56,9 +55,8 @@ class Polynomial:
     def __str__(self):
         """string format the entire polynomial"""
         terms = []
-        degrees = list(self.coefficient_dict.keys())
-        degrees.sort()
-        degrees.reverse()
+        degrees = list(self.coefficient_dict)
+        degrees = sorted(degrees, reverse=True)
         for degree in degrees:
             term_formatted = (self.format_term(degree, self.coefficient_dict[degree]))
             if term_formatted:
@@ -88,11 +86,26 @@ class Bounds:
             raise ValueError("step size must be > 0")
         if upper_bound <= lower_bound:
             raise ValueError("invalid bounds")
-        self.full_range = numpy.arange(lower_bound, upper_bound + step_size, step_size).tolist()
+        self.full_range = self.float_range(lower_bound, upper_bound, step_size)
 
     def __str__(self):
         return "Bounds: [{} - {}], step_size: {}".format(
             self.lower_bound, self.upper_bound, self.step_size)
+
+    def float_range(self, lower_bound, upper_bound, step_size):
+        """Create range of floats"""
+        float_list = []
+        current = lower_bound
+        float_list.append(current)
+        while current + step_size < (upper_bound):
+            current += step_size
+            float_list.append(current)
+        # for relatively large step sizes, add one final item to account for roundoff error
+        # and ensure that the last number is very close to the upper bound.
+        if (upper_bound - current - step_size) >= 0: 
+            float_list.append(current + step_size)
+        return float_list
+
 
 class Parameters:
     """Contains several groups of parameters"""
@@ -106,7 +119,7 @@ class Parameters:
         """Create parameters object from polynomial, bounds, and algorithm parameters"""
         bounds = Bounds(lower, upper, step)
         polynomial = Polynomial(polynomial_coefficients)
-        return Parameters(polynomial, bounds, algorithm)
+        return cls(polynomial, bounds, algorithm)
 
 
 # Misc helper functions
@@ -184,7 +197,7 @@ def parse_commandline_arguments(argv):
         if lower >= upper:
             log("invalid bounds: {} {}".format(lower, upper))
             return
-        if (lower < 0 or upper < 0) and any_non_int_numbers(polynomial_coefficients.keys()):
+        if (lower < 0 or upper < 0) and any_non_int_numbers(polynomial_coefficients):
             log("Fractional exponents not supported for negative values.")
             return
     algorithm_function = get_algorithm(algorithm)
@@ -194,7 +207,7 @@ def parse_commandline_arguments(argv):
     if not polynomial_coefficients:
         log("Polynomial not specified or invalid")
         return
-    if any_negative(polynomial_coefficients.keys()):
+    if any_negative(polynomial_coefficients):
         log("Only positive exponents supported")
         return
     return Parameters.factory(polynomial_coefficients,
@@ -221,7 +234,7 @@ def parse_polynomial_coefficients(dict_literal):
 @has_property("algorithm")
 def midpoint(poly, lower, upper):
     """Calculate midpoint slice from two polynomial evaluations and step size"""
-    value = poly.evaluate((upper+lower)/2)
+    value = poly.evaluate((upper+lower)/2.0)
     return (upper - lower) * value
 
 @has_property("algorithm")
@@ -229,15 +242,15 @@ def trapezoid(poly, lower, upper):
     """Calculate trapezoid slice from two polynomial evaluations and step size"""
     lower_value = poly.evaluate(lower)
     upper_value = poly.evaluate(upper)
-    return (upper - lower) * ((lower_value + upper_value)/2)
+    return (upper - lower) * ((lower_value + upper_value)/2.0)
 
 @has_property("algorithm")
 def simpson(poly, lower, upper):
     """Calculate parabola (Simpson) slice from two polynomial evaluations and step size"""
     lower_value = poly.evaluate(lower)
     upper_value = poly.evaluate(upper)
-    midpoint_value = poly.evaluate((lower+upper)/2)
-    return ((upper - lower) / 6) * (lower_value + 4 * midpoint_value + upper_value)
+    midpoint_value = poly.evaluate((lower+upper)/2.0)
+    return ((upper - lower) / 6.0) * (lower_value + 4 * midpoint_value + upper_value)
 
 def get_algorithm(algorithm_name):
     """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""

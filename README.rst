@@ -20,6 +20,7 @@ area\_under\_curve
    compare that to how accurate the midpoint, trapezoid, and simpson approximations are with various
    steps sizes.
 
+-  Why not use numpy?  You probably should, but I wanted to do everything from scratch for fun.
 examples:
 ---------
 
