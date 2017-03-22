@@ -191,7 +191,7 @@ class AreaTest(unittest.TestCase):
     """Test class for parsing command line arguments """
     def test_simple_area_1(self):
         """area test 1"""
-        bounds = auc.Bounds(0, 10, .001)
+        bounds = auc.Bounds(0, 10, .1)
         polynomial = auc.Polynomial({1:1}) # f(x) = x
         algorithm = auc.get_algorithm("trapezoid")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
