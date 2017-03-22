@@ -9,7 +9,7 @@ if sys.version_info < (2, 7):
 
 
 setup(name='area_under_curve',
-      version='0.9.8',
+      version='0.9.9',
       description='Calculate area under curve',
       long_description=open('README.rst').read(),
       url='https://github.com/smycynek/area_under_curve',
@@ -28,8 +28,5 @@ setup(name='area_under_curve',
       ],
 
       packages=['area_under_curve'],
-      install_requires=[
-          'numpy',
-      ],
       keywords='riemann-sum calculus',
       zip_safe=False)

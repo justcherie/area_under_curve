@@ -1,5 +1,5 @@
 # area_under_curve
-* Version 0.9.8
+* Version 0.9.9
 * Python 2.7/3.5+ module to calculate riemann sum area under a curve
 * Copyright 2017 Steven Mycynek
 * Supports 
@@ -16,6 +16,7 @@
 * This was just a fun experiment I did on a couple airplane rides and might not be suitable for production use.  
 * Try a simple function you can integrate by hand easily, like `f(x) = x^3` from `[0-10]`, and compare that to how accurate the midpoint, trapezoid, and simpson approximations are with various steps sizes.
 
+* Why not use numpy?  You probably should, but I wanted to do everything from scratch for fun.
 
 ## examples:
 
