@@ -17,7 +17,7 @@ class BoundsTest(unittest.TestCase):
         assert bounds_ok.lower_bound == 2
         assert bounds_ok.upper_bound == 4
         assert bounds_ok.step_size == .1
-        assert len(bounds_ok.full_range) == 20
+        assert len(bounds_ok.full_range) == 21
 
     def test_bounds_ok2(self):
         """basic bounds check"""
@@ -25,7 +25,7 @@ class BoundsTest(unittest.TestCase):
         assert bounds_ok.lower_bound == 0
         assert bounds_ok.upper_bound == 100
         assert bounds_ok.step_size == .01
-        assert len(bounds_ok.full_range) == 10000
+        assert len(bounds_ok.full_range) == 10001
 
     def test_bounds_ok3(self):
         """Check that large step sizes don't cause roundoff error problems"""
@@ -212,6 +212,26 @@ class AreaTest(unittest.TestCase):
         algorithm = auc.get_algorithm("midpoint")
         area = auc.area_under_curve(polynomial, bounds, algorithm)
         self.assertAlmostEqual(area, 0)
+
+
+    def test_simple_area_4(self):
+        """area test 4"""
+        bounds = auc.Bounds(-5, 5, 1)
+        polynomial = auc.Polynomial({3:1}) # f(x) = x^3
+        algorithm = auc.get_algorithm("midpoint")
+        area = auc.area_under_curve(polynomial, bounds, algorithm)
+        self.assertAlmostEqual(area, 0)
+
+
+    def test_simple_area_5(self):
+        """area test 5"""
+        bounds = auc.Bounds(-5, 5, .01)
+        polynomial = auc.Polynomial({3:1}) # f(x) = x^3
+        algorithm = auc.get_algorithm("midpoint")
+        area = auc.area_under_curve(polynomial, bounds, algorithm)
+        self.assertAlmostEqual(area, 0)
+
+
 
 class EntryPointTest(unittest.TestCase):
     """Test main entrypoint"""

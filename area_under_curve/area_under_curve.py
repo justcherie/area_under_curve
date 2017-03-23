@@ -97,13 +97,11 @@ class Bounds:
         float_list = []
         current = lower_bound
         float_list.append(current)
-        while current + step_size < (upper_bound):
+        # Final number should be almost equal to upper bound.
+        # Adding fraction of step_size offset to account for rounding errors.
+        while current + step_size < (upper_bound + (step_size * .1)):
             current += step_size
             float_list.append(current)
-        # for relatively large step sizes, add one final item to account for roundoff error
-        # and ensure that the last number is very close to the upper bound.
-        if (upper_bound - current - step_size) >= 0: 
-            float_list.append(current + step_size)
         return float_list
 
 
