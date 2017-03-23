@@ -5,3 +5,4 @@ include tests/unit_test.py
 include tests/demo.py
 
 prune p3
+prune p2
