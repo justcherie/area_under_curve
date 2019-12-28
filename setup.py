@@ -9,7 +9,7 @@ if sys.version_info < (3, 7):
 
 
 setup(name='area_under_curve',
-      version='1.0.4',
+      version='1.0.5',
       description='Calculate area under curve',
       long_description=open('README.rst').read(),
       url='https://github.com/smycynek/area_under_curve',
