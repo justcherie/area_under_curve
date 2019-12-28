@@ -28,7 +28,7 @@ area_under_curve
 examples:
 ---------
 
-``python area_under_curve.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
+``python3 area_under_curve.py --polynomial {3:1} --lower 0 --upper 10 --step .1 --algorithm simpson``
 
 or:
 
