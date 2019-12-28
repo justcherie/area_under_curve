@@ -3,11 +3,9 @@
 import math
 import sys
 import unittest
-
 sys.path.insert(0, '../area_under_curve/')
-
 import area_under_curve as auc
-auc.LOGGING = False
+
 
 class BoundsTest(unittest.TestCase):
     """Test class for Bounds class"""
@@ -121,7 +119,7 @@ class ParseArgumentsTest(unittest.TestCase):
     def test_ok(self):
         """basic successful argument test"""
         parsed_params = auc.parse_commandline_arguments(["-p", "{3:2}", "-s", ".2", "-a",
-                                             "simpson", "-l", "-2", "-u", "1.5"])
+                                                         "simpson", "-l", "-2", "-u", "1.5"])
         assert parsed_params.bounds.step_size == .2
         assert parsed_params.bounds.lower_bound == -2
         assert parsed_params.bounds.upper_bound == 1.5
@@ -141,7 +139,7 @@ class ParseArgumentsTest(unittest.TestCase):
     def test_fractional_exponent_negative_value(self):
         """reject fractional exponents with negative bounds"""
         parsed_params = auc.parse_commandline_arguments(["-p", "{1.5:2}", "-s", ".2",
-                                             "-l", "-5", "-a", "simpson"])
+                                                         "-l", "-5", "-a", "simpson"])
         assert parsed_params is None
 
     def test_invalid_step(self):

@@ -1,0 +1,1 @@
+pandoc README.md -o README.rst -t rst --columns 100

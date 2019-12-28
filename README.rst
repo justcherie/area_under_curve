@@ -1,23 +1,24 @@
-area\_under\_curve
-==================
+area_under_curve
+================
 
--  Version 1.0.1
--  Python 2.7/3.5+ module to calculate riemann sum area under a curve
--  Copyright 2017 Steven Mycynek
+-  Version 1.0.4
+-  Python 3.7+ module to calculate riemann sum area under a curve
+-  Copyright 2019 Steven Mycynek
 -  Supports
 
    -  simpson, trapezoid, and midpoint algorithms,
    -  n-degree single variable polynomials, including fractional exponents,
    -  variable step size
 
--  https://github.com/smycynek/area_under_curve
+-  https://pypi.python.org/pypi/area-under-curve
 
 ``USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}...``
 ``-l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step>``
 ``-a|--algorithm <simpson | trapezoid | midpoint>``
 
--  This was just a fun experiment I did on a couple airplane rides and might not be suitable for
-   production use.
+-  | This was just a fun experiment I did on a couple airplane rides and might not be suitable for
+     production use.
+
 -  Try a simple function you can integrate by hand easily, like ``f(x) = x^3`` from ``[0-10]``, and
    compare that to how accurate the midpoint, trapezoid, and simpson approximations are with various
    steps sizes.

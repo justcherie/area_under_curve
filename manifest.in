@@ -1,5 +1,5 @@
 prune p3
-prune p2
+
 
 include LICENSE
 include README.rst
