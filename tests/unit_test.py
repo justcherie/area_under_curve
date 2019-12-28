@@ -4,7 +4,7 @@ import math
 import sys
 import unittest
 sys.path.insert(0, '../area_under_curve/')
-import area_under_curve as auc
+import area_under_curve as auc # pylint: disable=wrong-import-position
 
 
 class BoundsTest(unittest.TestCase):
