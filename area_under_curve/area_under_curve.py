@@ -7,9 +7,10 @@ import getopt
 import math
 import sys
 import logging
+from dataclasses import dataclass
 
-logger = logging.getLogger()
-logger.setLevel(10)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(10)
 
 USAGE = """ -p|--poly {DegreeN1:CoefficientM1, DegreeN2:CoefficientM2, ...}
 -l|--lower <lower_bound> -u|--upper <upper_bound> -s|--step <step> 
@@ -102,16 +103,16 @@ class Bounds:
             float_list.append(current)
         return float_list
 
-
+@dataclass
 class Parameters:
     """Contains several groups of parameters"""
-    def __init__(self, polynomial, bounds, algorithm):
-        self.polynomial = polynomial
-        self.bounds = bounds
-        self.algorithm = algorithm
+    polynomial: Polynomial
+    bounds: Bounds
+    algorithm: str
 
     @classmethod
-    def factory(cls, polynomial_coefficients, lower, upper, step, algorithm):
+    def factory(cls, polynomial_coefficients, #pylint: disable=too-many-arguments
+                lower, upper, step, algorithm):
         """Create parameters object from polynomial, bounds, and algorithm parameters"""
         bounds = Bounds(lower, upper, step)
         polynomial = Polynomial(polynomial_coefficients)
@@ -126,7 +127,7 @@ def is_number(string):
         float(string)
         return True
     except ValueError as err:
-        logger.error(f"Error: {string} {str(err)}")
+        LOGGER.error(f"Error: {string} {str(err)}")
         return False
 
 def any_non_int_numbers(collection):
@@ -146,7 +147,7 @@ def has_property(name):
     return wrap
 
 # Argument parsing
-def parse_commandline_arguments(argv):
+def parse_commandline_arguments(argv): # pylint: disable=too-many-return-statements,too-many-branches
     """Parse command line arguments and return a parameters
     object with Bounds, Polynomial, and Algorithm
     """
@@ -167,11 +168,11 @@ def parse_commandline_arguments(argv):
             logging.error("Error in numerical arguments.")
             return None
     except getopt.GetoptError as err:
-        logger.error(f"Option error: {str(err)}")
+        LOGGER.error(f"Option error: {str(err)}")
         return None
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            logger.info(FULL_USAGE)
+            LOGGER.info(FULL_USAGE)
             sys.exit(0)
         elif opt in ("-l", "--lower"):
             lower = float(arg)
@@ -184,23 +185,23 @@ def parse_commandline_arguments(argv):
         elif opt in ("-p", "--polynomial"):
             polynomial_coefficients = parse_polynomial_coefficients(arg)
         if step_size <= 0:
-            logger.error(f"step size must be > 0: {step_size}")
+            LOGGER.error(f"step size must be > 0: {step_size}")
             return None
         if lower >= upper:
-            logger.error(f"invalid bounds: {lower} {upper}")
+            LOGGER.error(f"invalid bounds: {lower} {upper}")
             return None
         if (lower < 0 or upper < 0) and any_non_int_numbers(polynomial_coefficients):
-            logger.error("Fractional exponents not supported for negative values.")
+            LOGGER.error("Fractional exponents not supported for negative values.")
             return None
     algorithm_function = get_algorithm(algorithm)
     if not algorithm_function:
-        logger.error(f"Algorithm : {algorithm} not found!")
+        LOGGER.error(f"Algorithm : {algorithm} not found!")
         return None
     if not polynomial_coefficients:
-        logger.error("Polynomial not specified or invalid")
+        LOGGER.error("Polynomial not specified or invalid")
         return None
     if any_negative(polynomial_coefficients):
-        logger.error("Only positive exponents supported")
+        LOGGER.error("Only positive exponents supported")
         return None
     return Parameters.factory(polynomial_coefficients,
                               lower, upper, step_size, algorithm_function)
@@ -212,12 +213,12 @@ def parse_polynomial_coefficients(dict_literal):
     try:
         coefficient_dict = ast.literal_eval(dict_literal)
     except SyntaxError as errs:
-        logger.error(f"Syntax Error parsing polynomial args: {dict_literal} {str(errs)}")
+        LOGGER.error(f"Syntax Error parsing polynomial args: {dict_literal} {str(errs)}")
     except ValueError as errv:
         logging.error(f"Value Error parsing polynomial args: {dict_literal} {str(errv)}")
         return None
     if not isinstance(coefficient_dict, dict):
-        logger.error(f"Malformed dictionary: {coefficient_dict}")
+        LOGGER.error(f"Malformed dictionary: {coefficient_dict}")
         return None
     return coefficient_dict
 
@@ -251,7 +252,7 @@ def get_algorithm(algorithm_name):
             return globals()[algorithm_name]
         # TODO Cleanup
         return None
-    logger.error(f"Algorithm {algorithm_name} not found or invalid!")
+    LOGGER.error(f"Algorithm {algorithm_name} not found or invalid!")
     return None
 
 
@@ -260,9 +261,9 @@ def area_under_curve(poly, bounds, algorithm):
     """Finds the area under a polynomial between the specified bounds
     using a rectangle-sum (of width 1) approximation.
     """
-    logger.info(poly)
-    logger.info(bounds)
-    logger.info(f"Algorithm: {algorithm.__name__}")
+    LOGGER.info(poly)
+    LOGGER.info(bounds)
+    LOGGER.info(f"Algorithm: {algorithm.__name__}")
     range_upper_index = len(bounds.full_range) - 1
     total_area = 0
     for range_index, val in enumerate(bounds.full_range):
