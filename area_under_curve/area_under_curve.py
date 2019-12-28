@@ -246,12 +246,8 @@ def simpson(poly, lower, upper):
 
 def get_algorithm(algorithm_name):
     """Get algorithm function by name by looking up in globals with the 'algorithm' attribute set"""
-    if algorithm_name in globals():
-        algorithm = globals()[algorithm_name]
-        if "algorithm" in dir(algorithm):
-            return globals()[algorithm_name]
-        # TODO Cleanup
-        return None
+    if algorithm_name in globals() and "algorithm" in dir(globals()[algorithm_name]):
+        return globals()[algorithm_name]
     LOGGER.error(f"Algorithm {algorithm_name} not found or invalid!")
     return None
 

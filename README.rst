@@ -1,7 +1,7 @@
 area_under_curve
 ================
 
--  Version 1.0.5
+-  Version 1.0.6
 -  Python 3.7+ module to calculate riemann sum area under a curve
 -  Copyright 2019 Steven Mycynek
 -  Supports
